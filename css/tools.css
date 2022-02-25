@@ -1,0 +1,24 @@
+.tools {
+    width: 250px;
+    height: 80%;
+    background-color: #f3f3f3;
+    z-index: 100;
+    position: absolute;
+    top: 0;
+    right: 0;
+    overflow-y: auto;
+    border-radius: 5px;
+}
+
+.tools .title {
+    top: 0;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 auto;
+    background-color: rgb(255, 242, 242);
+    text-align: center;
+}
+
+.tools .contents {
+    padding: 5px;
+}
