@@ -137,6 +137,13 @@ document.addEventListener('DOMContentLoaded', function () {
   get_json();
 
 
+  //定期更新用
+  if(first_update == false){
+    setInterval(() => {
+      get_json();
+    }, 100);
+  }
+
   //オブジェクト選択時のハンドルを太くする
   fabric.Object.prototype.set({
     borderColor: "rgb(255, 191, 95)",//選択枠の色
