@@ -7,12 +7,43 @@ var params = url.searchParams;
 const room_id = params.get("room_id");
 
 if(room_id == null){
-alert("ルームIDが指定されていません");
-location.href = "index.html";
+  alert("ルームIDが指定されていません");
+  location.href = "index.html";
 }
 /*===============================
 room の管理コード　ここまで
 ===============================*/
+
+
+/*===============================
+room作成(空json送信)
+===============================*/
+$.ajax({
+  url: "http://127.0.0.1/get_json?room_id=" + room_id,
+  type: 'GET',
+  dataType: "json",
+  }).done(function (data) {
+      console.log(JSON.stringify(data, null, 2));
+      if(data["status"] == "False"){
+        console.log("create room(id:" + room_id + ")");
+        $.ajax({
+          url: "http://127.0.0.1/send?room_id=" + room_id,
+          data: {"json_data" : "",
+                    "room_last_update_time" : Date.now()},
+          type: 'POST',
+          dataType: "json",
+          }).done(function (data) {
+              console.log(JSON.stringify(data, null, 2));
+          }).fail(function (data) {
+          // error
+        });
+      }
+  }).fail(function (data) {
+  // error
+});
+
+
+
 document.addEventListener('DOMContentLoaded', function () {
   //選択表示
   var old_sel = null;
@@ -62,12 +93,15 @@ document.addEventListener('DOMContentLoaded', function () {
     canvas.renderAll.bind(canvas)
   );
 
+  var first_update = false;
+
   //canvas送信
   function send_json() {
     console.log("send_canvas : " + JSON.stringify(canvas));
     $.ajax({
       url: "http://127.0.0.1/send?room_id=" + room_id,
-      data: {"json_data" : JSON.stringify(canvas)},
+      data: {"json_data" : JSON.stringify(canvas),
+                "room_last_update_time" : Date.now()},
       type: 'POST',
       dataType: "json",
       }).done(function (data) {
@@ -85,7 +119,15 @@ document.addEventListener('DOMContentLoaded', function () {
       dataType: "json",
       }).done(function (data) {
           console.log(JSON.stringify(data, null, 2));
-          canvas.loadFromJSON(data["json_data"]).renderAll();
+          if(data["status"] == "True"){
+            //比較用に現在時刻を取得
+            if(data["room_last_update_time"] < Date.now()){
+              canvas.loadFromJSON(data["json_data"]).renderAll();
+
+              //フラグを変更
+              first_update = true;
+            }
+          }
       }).fail(function (data) {
       // error
     });
